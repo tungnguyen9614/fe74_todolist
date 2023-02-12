@@ -1,6 +1,6 @@
 var listTask = new taskList();
 var validation = new Validation();
-getLocalStorage();
+// getLocalStorage();
 
 function getEle(id) {
   return document.getElementById(id);
@@ -11,7 +11,6 @@ function getEle(id) {
  */
 function getTask() {
   var taskName = getEle("newTask").value;
-
   /**
    * Validation
    */
@@ -37,58 +36,66 @@ function getTask() {
 /**
  * Render Task
  */
-function renderTask(arrTask) {
-  var contentHTML = "";
-
-  arrTask.forEach(function (task) {
-    contentHTML += `
-    <li>
-        <span>${task.taskName}</span>
-        <div class="buttons">
-            <button class="remove" data-index="0" data-status="todo" onclick="deleteTask('${task.taskName}')">
-                <i class="fa fa-trash-alt"></i>
-            </button>
-            <button id="complete" class="complete" data-index="0" data-status="todo" onclick="completeTask('${task.taskName}')">
-                <i class="far fa-check-circle"></i>
-            </button>
-        </div>
-    </li>
-    `;
-  });
-
-  getEle("todo").innerHTML = contentHTML;
-}
-
-/**
- * Render Complete
- */
-// function renderComplete(name) {
+// function renderTask(arrTask) {
 //   var contentHTML = "";
-//     contentHTML = `
+
+//   arrTask.forEach(function(task) {
+//     contentHTML += `
 //     <li>
-//         <span style="color: green">${name}</span>
+//         <span>${task.taskName}</span>
 //         <div class="buttons">
-//             <button class="remove" data-index="0" data-status="completed" onclick="deleteTask('${name}')">
+//             <button class="remove" data-index="0" data-status="todo" onclick="deleteTask('${task.taskName}')">
 //                 <i class="fa fa-trash-alt"></i>
 //             </button>
-//             <button id="complete" class="complete" data-index="0" data-status="completed" onclick="uncompleteTask('${name}')">
-//                 <i class="far fa-check-circle"></i>
+//             <button id="complete" class="complete" data-index="0" data-status="todo" onclick="completeTask('${task.taskName}')">
+//                 <i class="fas fa-check-circle"></i>
 //             </button>
 //         </div>
 //     </li>
 //     `;
- 
+//   });
 
+//   getEle("todo").innerHTML = contentHTML;
 //   getEle("completed").innerHTML = contentHTML;
 // }
 
-/**
- * Function compleTask
- */
-// function completeTask(name){
-//   console.log(name);
-//   renderComplete(name);
-// }
+function renderTask(taskListArr) {
+  var todo = "";
+  var completed = "";
+  taskListArr.forEach(function (task) {
+    if (!task.status) {
+      todo += `
+      <li>
+        <span>${task.taskName}</span>
+        <div class="buttons">
+          <button class="remove" data-index="0" data-status="todo" onclick="deleteTask('${task.taskName}')">
+            <i class="fa fa-trash-alt"></i>
+          </button>
+          <button class="complete" data-index="0" data-status="todo" onclick="completeTask('${task.taskName}')">
+            <i class="far fa-check-circle"></i>
+          </button>
+        </div>
+      </li>
+      `;
+    } else {
+      completed += `
+      <li>
+        <span>${task.taskName}</span>
+        <div class="buttons">
+          <button class="remove" data-index="0" data-status="completed" onclick="deleteTask('${task.taskName}')">
+            <i class="fa fa-trash-alt"></i>
+          </button>
+          <button class="complete" data-index="0" data-status="completed" onclick="completeTask('${task.taskName}')">
+            <i class="fas fa-check-circle"></i>
+          </button>
+        </div>
+      </li>
+      `;
+    }
+  });
+  getEle("todo").innerHTML = todo;
+  getEle("completed").innerHTML = completed;
+}
 
 /**
  * Add Task
@@ -96,7 +103,6 @@ function renderTask(arrTask) {
 
 getEle("addItem").addEventListener("click", function () {
   var task = getTask();
-  //   console.log(task);
   if (task) {
     listTask.addTask(task);
     renderTask(listTask.arr);
@@ -114,27 +120,11 @@ function deleteTask(taskName) {
   setLocalStorage();
 }
 
-/**
- * Change status
- */
-function changeStatus(id) {
-  listTask.arr.forEach(function (item) {
-    if (item.status == "todo") {
-      listTask.deleteTask(id);
-      renderTask(listTask.arr);
-
-      var todo = new Task(item.taskName, "complete");
-      listTask.addTask(todo);
-      renderComplete(listTask.arr);
-    } else if (item.status == "complete") {
-      listTask.deleteTask(id);
-      renderTask(listTask.arr);
-
-      var todo = new Task(item.taskName, "todo");
-      listTask.addTask(todo);
-      renderComplete(listTask.arr);
-    }
-  });
+function completeTask(name) {
+  var task = listTask.getTaskByName(name);
+  task.status = !task.status;
+  renderTask(listTask.arr);
+  setLocalStorage();
 }
 
 function setLocalStorage() {

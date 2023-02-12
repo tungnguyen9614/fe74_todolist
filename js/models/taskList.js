@@ -27,7 +27,7 @@ function taskList(){
         }
     }
 
-    this.getTaskById = function(name){
+    this.getTaskByName = function(name){
         var index = this.findIndex(name);
 
         if(index !== -1){
